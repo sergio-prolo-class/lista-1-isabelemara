@@ -17,12 +17,12 @@ public class App {
             System.out.println("Erro: Cor inválida fornecida.");
             return;
         }
-
+//formula da resistencia, multiplicamos por 10 para o mesmo virar uma dezena e sair da unidade
         double resistencia = (digito1 * 10 + digito2) * multiplicador;
 
         System.out.printf("Resistência: %.1f Ω (+- %s)\n", resistencia, tolerancia);
     }
-
+//converte a cor em um numero para termos o valor da cor
     public static int obterValorCor(String cor) {
         switch (cor) {
             case "preto": return 0;
@@ -38,7 +38,7 @@ public class App {
             default: return -1;
         }
     }
-
+    //converte a cor em um numero para termos o valor do multiplicador
     public static double obterMultiplicador(String cor) {
         switch (cor) {
             case "preto": return 1;
@@ -57,6 +57,7 @@ public class App {
         }
     }
 
+//converte para a tolerancia referente a cor escolhida
     public static String obterTolerancia(String cor) {
         switch (cor) {
             case "marrom": return "1%";
