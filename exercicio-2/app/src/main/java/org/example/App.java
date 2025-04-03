@@ -17,12 +17,18 @@ public class App {
             System.out.println("Erro: Cor inválida fornecida.");
             return;
         }
-//formula da resistencia, multiplicamos por 10 para o mesmo virar uma dezena e sair da unidade
+        //formula da resistencia, multiplicamos por 10 para o mesmo virar uma dezena e sair da unidade
         double resistencia = (digito1 * 10 + digito2) * multiplicador;
 
-        System.out.printf("Resistência: %.1f Ω (+- %s)\n", resistencia, tolerancia);
+        //assim ele formata a resistencia
+        String resistenciaFormatada = formatarResistencia(resistencia);
+
+
+        // faz a resistencia formatada K-->M-->G
+        System.out.printf("Resistência: %sΩ (+- %s)\n", resistenciaFormatada, tolerancia);
+
     }
-//converte a cor em um numero para termos o valor da cor
+    //converte a cor em um numero para termos o valor da cor
     public static int obterValorCor(String cor) {
         switch (cor) {
             case "preto": return 0;
@@ -70,5 +76,15 @@ public class App {
             case "prata": return "10%";
             default: return "20%";
         }
+    }
+
+    public static String formatarResistencia(double valor) {
+        String[] unidades = {"", "K", "M", "G"};
+        int unidade = 0;
+        while (valor >= 1000 && unidade < unidades.length - 1) {
+            valor /= 1000;
+            unidade++;
+        }
+        return String.format("%.1f%s", valor, unidades[unidade]);
     }
 }
