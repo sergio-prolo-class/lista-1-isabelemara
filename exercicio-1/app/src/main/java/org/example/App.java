@@ -43,29 +43,21 @@ public class App {
         }
     }
 
-    public static void desenharLosango(int tamanho) {
-        System.out.println("Losango:");
+    public static void desenharLosango(int tamanho) { System.out.println("Losango:"); int meio = tamanho / 2;
 
-        //tamanho precisa ser impar, e meio seria o meio do losango
-        int meio = tamanho / 2;
+// Loop para desenhar da ponta até o meio
+        /// o repeat vai servir para não usarmos for encadeado, ficando algo dificil de compreender
         for (int i = 0; i <= meio; i++) {
-            for (int j = 0; j < meio - i; j++) {
-                System.out.print(" ");
-            }
-            for (int j = 0; j < 2 * i + 1; j++) {
-                System.out.print("*");
-            }
-            System.out.println();
+            System.out.print(" ".repeat(meio - i));
+            System.out.println("*".repeat(2 * i + 1));
         }
+
+// Loop para desenhar do meio até a parte de baixo
         for (int i = meio - 1; i >= 0; i--) {
-            for (int j = 0; j < meio - i; j++) {
-                System.out.print(" ");
-            }
-            for (int j = 0; j < 2 * i + 1; j++) {
-                System.out.print("*");
-            }
-            System.out.println();
+            System.out.print(" ".repeat(meio - i));
+            System.out.println("*".repeat(2 * i + 1));
         }
+
     }
 
     public static void desenharRetangulo(int altura, int largura) {
