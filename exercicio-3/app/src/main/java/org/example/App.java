@@ -1,23 +1,31 @@
 package org.example;
+import java.util.Random;
 
-public class GeradorTabuleiro {
+public class App {
+    //Tabuleiro 10x10
     static final int TAM = 10;
     static final char VAZIO = '.';
-    static final char[][] tabuleiro = new char[TAM][TAM];
+    static char[][] tabuleiro;
 
     public static void main(String[] args) {
-        inicializarTabuleiro();
+
+        tabuleiro = criarTabuleiroVazio(); // inicializa aqui
         imprimirTabuleiro();
     }
 
-    static void inicializarTabuleiro() {
+
+    //cria com .
+    static char[][] criarTabuleiroVazio() {
+        char[][] matriz = new char[TAM][TAM]; // ainda precisa do new aqui
         for (int i = 0; i < TAM; i++) {
             for (int j = 0; j < TAM; j++) {
-                tabuleiro[i][j] = VAZIO;
+                matriz[i][j] = VAZIO;
             }
         }
+        return matriz;
     }
 
+    //imprime o tabuleiro
     static void imprimirTabuleiro() {
         for (int i = 0; i < TAM; i++) {
             for (int j = 0; j < TAM; j++) {
@@ -27,3 +35,4 @@ public class GeradorTabuleiro {
         }
     }
 }
+
