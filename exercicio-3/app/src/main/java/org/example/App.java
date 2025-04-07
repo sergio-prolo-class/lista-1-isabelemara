@@ -1,4 +1,7 @@
 package org.example;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 public class App {
@@ -10,7 +13,8 @@ public class App {
     public static void main(String[] args) {
         tabuleiro = criarTabuleiroVazio();     // Cria o tabuleiro 10x10 vazio
         posicionarNavios();                    // Posiciona os navios aleatoriamente
-        imprimirTabuleiro();                   // Mostra o tabuleiro final
+        imprimirTabuleiro();                   // Mostra o tabuleiro final no console
+        salvarTabuleiroEmArquivo("tabuleiro.txt"); // Salva o tabuleiro num arquivo texto
     }
 
     // Cria um tabuleiro com todos os espaços marcados como '.'
@@ -78,5 +82,20 @@ public class App {
             }
         }
         return true;
+    }
+
+    // Salva o tabuleiro em um arquivo de texto (linha por linha)
+    static void salvarTabuleiroEmArquivo(String nomeArquivo) {
+        try (FileWriter writer = new FileWriter(nomeArquivo)) {
+            for (int i = 0; i < TAM; i++) {
+                for (int j = 0; j < TAM; j++) {
+                    writer.write(tabuleiro[i][j]);
+                }
+                writer.write('\n');
+            }
+            System.out.println("Tabuleiro salvo em " + nomeArquivo);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o tabuleiro: " + e.getMessage());
+        }
     }
 }
