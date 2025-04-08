@@ -7,81 +7,44 @@ public class App {
     static char[][] tabuleiro = new char[TAM][TAM];
     static boolean[][] visitado = new boolean[TAM][TAM];
 
-    // Tamanhos esperados de cada navio
     static final Map<Character, Integer> tamanhosNavios = Map.of(
-            'P', 5, // Porta-aviões
-            'E', 4, // Encouraçado
-            'C', 3, // Cruzador
-            'S', 3, // Submarino
-            'N', 2  // Contratorpedeiro
+            'P', 5,
+            'E', 4,
+            'C', 3,
+            'S', 3,
+            'N', 2
     );
-
-    // Armazena quantas células de cada navio foram encontradas
-    static Map<Character, Integer> contagemCelulas = new HashMap<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Parte 1 – Leitura e validação do tamanho do tabuleiro
+        // Leitura do tabuleiro
         for (int i = 0; i < TAM; i++) {
             if (!scanner.hasNextLine()) {
-                System.out.println("Tabuleiro inválido: número de linhas insuficiente.");
+                System.out.println("Tabuleiro inválido: menos de 10 linhas.");
                 return;
             }
 
-            String linha = scanner.nextLine().replaceAll("\\s+", "");
+            String linha = scanner.nextLine().trim();
+            String[] colunas = linha.split("\\s+");
 
-            if (linha.length() != TAM) {
-                System.out.println("Tabuleiro inválido: a linha " + i + " possui " + linha.length() + " colunas, mas deveria ter 10.");
+            if (colunas.length != TAM) {
+                System.out.println("Tabuleiro inválido: a linha " + (i + 1) + " possui " + colunas.length + " colunas, mas deveria ter 10.");
                 return;
             }
 
             for (int j = 0; j < TAM; j++) {
-                char c = linha.charAt(j);
-                switch (c) {
-                    case '.', 'P', 'E', 'C', 'S', 'N':
-                        tabuleiro[i][j] = c;
-                        break;
-                    default:
-                        System.out.println("Tabuleiro inválido: caractere inválido '" + c + "' na posição (" + i + ", " + j + ")");
-                        return;
+                char c = colunas[j].charAt(0);
+                tabuleiro[i][j] = c;
+
+                if (!tamanhosNavios.containsKey(c) && c != '.') {
+                    System.out.println("Tabuleiro inválido: caractere inválido '" + c + "' na posição (" + (i + 1) + "," + (j + 1) + ").");
+                    return;
                 }
             }
         }
 
-        // Verifica se há mais linhas que o permitido
-        if (scanner.hasNextLine()) {
-            System.out.println("Tabuleiro inválido: mais de 10 linhas fornecidas.");
-            return;
-        }
-
-        // Parte 2 – Inicializa contagem de células
-        for (char navio : tamanhosNavios.keySet()) {
-            contagemCelulas.put(navio, 0);
-        }
-
-        // Parte 3 – Conta células de cada tipo de navio
-        for (int i = 0; i < TAM; i++) {
-            for (int j = 0; j < TAM; j++) {
-                char c = tabuleiro[i][j];
-                if (tamanhosNavios.containsKey(c)) {
-                    contagemCelulas.put(c, contagemCelulas.get(c) + 1);
-                }
-            }
-        }
-
-        // Parte 4 – Verifica se a contagem de cada navio está correta
-        for (char navio : tamanhosNavios.keySet()) {
-            int esperado = tamanhosNavios.get(navio);
-            int encontrado = contagemCelulas.get(navio);
-            if (encontrado != esperado) {
-                System.out.println("Tabuleiro inválido: quantidade de '" + navio + "' incorreta (esperado: " + esperado + ", encontrado: " + encontrado + ")");
-                return;
-            }
-        }
-
-        // Parte 5 – Valida alinhamento e unicidade dos navios
-        int naviosValidos = 0;
+        // Verificação por blocos DFS
         Set<Character> naviosEncontrados = new HashSet<>();
 
         for (int i = 0; i < TAM; i++) {
@@ -91,36 +54,35 @@ public class App {
                     List<int[]> posicoes = new ArrayList<>();
                     dfs(i, j, c, posicoes);
 
-                    if (!verificaAlinhamento(posicoes)) {
-                        System.out.println("Tabuleiro inválido: navio '" + c + "' não está alinhado corretamente.");
-                        return;
-                    }
-
-                    if (posicoes.size() != tamanhosNavios.get(c)) {
-                        System.out.println("Tabuleiro inválido: tamanho incorreto do navio '" + c + "'.");
-                        return;
-                    }
-
                     if (naviosEncontrados.contains(c)) {
                         System.out.println("Tabuleiro inválido: navio '" + c + "' aparece mais de uma vez.");
                         return;
                     }
 
+                    if (!verificaAlinhamento(posicoes)) {
+                        System.out.println("Tabuleiro inválido: navio '" + c + "' deve estar na horizontal ou vertical.");
+                        return;
+                    }
+
+                    if (posicoes.size() != tamanhosNavios.get(c)) {
+                        System.out.println("Tabuleiro inválido: tamanho incorreto do navio '" + c + "' (esperado: " + tamanhosNavios.get(c) + ", encontrado: " + posicoes.size() + ").");
+                        return;
+                    }
+
                     naviosEncontrados.add(c);
-                    naviosValidos++;
                 }
             }
         }
 
-        // Parte 6 – Verifica se todos os navios foram encontrados
-        if (naviosValidos != tamanhosNavios.size()) {
-            System.out.println("Tabuleiro inválido: quantidade de navios incorreta.");
+        // Verifica se todos os tipos de navios foram encontrados
+        if (naviosEncontrados.size() != tamanhosNavios.size()) {
+            System.out.println("Tabuleiro inválido: não inclui um navio de cada tipo.");
         } else {
             System.out.println("Tabuleiro válido");
         }
     }
 
-    // Busca em profundidade para agrupar partes do mesmo navio
+    // DFS para marcar o navio completo
     static void dfs(int i, int j, char tipo, List<int[]> posicoes) {
         if (i < 0 || j < 0 || i >= TAM || j >= TAM) return;
         if (visitado[i][j] || tabuleiro[i][j] != tipo) return;
@@ -128,24 +90,44 @@ public class App {
         visitado[i][j] = true;
         posicoes.add(new int[]{i, j});
 
-        dfs(i + 1, j, tipo, posicoes);
-        dfs(i - 1, j, tipo, posicoes);
-        dfs(i, j + 1, tipo, posicoes);
-        dfs(i, j - 1, tipo, posicoes);
+        // Agora inclui diagonais
+        for (int di = -1; di <= 1; di++) {
+            for (int dj = -1; dj <= 1; dj++) {
+                if (di != 0 || dj != 0) {
+                    dfs(i + di, j + dj, tipo, posicoes);
+                }
+            }
+        }
     }
 
-    // Verifica se o navio está em linha reta (horizontal ou vertical)
+
+    // Verifica alinhamento reto
     static boolean verificaAlinhamento(List<int[]> posicoes) {
+        if (posicoes.isEmpty()) return false;
+
         boolean mesmaLinha = true;
         boolean mesmaColuna = true;
-        int linha = posicoes.get(0)[0];
-        int coluna = posicoes.get(0)[1];
+        int linhaRef = posicoes.get(0)[0];
+        int colunaRef = posicoes.get(0)[1];
 
         for (int[] pos : posicoes) {
-            if (pos[0] != linha) mesmaLinha = false;
-            if (pos[1] != coluna) mesmaColuna = false;
+            if (pos[0] != linhaRef) mesmaLinha = false;
+            if (pos[1] != colunaRef) mesmaColuna = false;
         }
 
-        return mesmaLinha || mesmaColuna;
+        if (!mesmaLinha && !mesmaColuna) return false;
+
+        List<Integer> indices = new ArrayList<>();
+        if (mesmaLinha) {
+            for (int[] pos : posicoes) indices.add(pos[1]);
+        } else {
+            for (int[] pos : posicoes) indices.add(pos[0]);
+        }
+        Collections.sort(indices);
+        for (int i = 1; i < indices.size(); i++) {
+            if (indices.get(i) != indices.get(i - 1) + 1) return false;
+        }
+
+        return true;
     }
 }
